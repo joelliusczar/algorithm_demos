@@ -1,0 +1,104 @@
+*
+{
+	border: dashed;
+    border-width: 1px;
+    border-color: #0000FF;
+}
+
+#header {
+	height: 50px;
+	background-color: #F38630;
+	}
+	
+#leftcolumn
+{
+	height: 300px;
+	width: 150px;
+	background-color: #A7DBD8;
+	float: left;
+	margin-bottom: 10px;
+}
+
+#footer {
+	height: 50px;
+	background-color: #69D2E7;
+	/*Add your CSS here!*/
+    clear: both;
+}
+
+#content
+{
+background-color: #E0E4CC;
+width: 1175px;
+height: 700px;
+float: right;
+}
+
+textarea
+{
+width:580px;
+height: 300px;
+}
+
+.subcontent
+{
+	height:690px;
+	width: 580px;
+}
+
+.contleft
+{
+	background-color: #d3ec1f;
+	float:left;
+}
+
+.contright
+{
+	background-color: #BF4094;
+	float:right;
+}
+
+#codewindow
+{
+border: 5px solid;
+font-family: monospace;
+font-size: small;
+background-color: #ffffff;
+height: 300px;
+overflow: scroll;
+}
+
+.selectedLine
+{
+background-color: #729fcf;
+color: #ffffff;
+}
+
+#graphbox
+{
+height: 150px;
+background-color:#eeeeec;
+}
+
+.bar
+{
+	width: 25px;
+	background-color:#204a87;
+	display:inline-block;
+}
+
+#stack
+{
+	height: 200px;
+	width: 100px;
+	overflow: scroll;
+}
+
+#order
+{
+	height: 200px;
+	width: 470px;
+	overflow: scroll;
+}
+
+
