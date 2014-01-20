@@ -17,6 +17,7 @@
 	<script src="jquery.ui.button.js"></script>
 	<script src="jquery.ui.spinner.js"></script>
 	<script src="algorithms_setup.js"></script>
+	<script src="qsort.js"></script>
 	
 	
 </head>
@@ -28,22 +29,34 @@
 		<div class="contleft subcontent">
 			<input id="numberbox" name="value">
 			<button id="getvalue">Submit</button>
+			<button id="start">Start</button>
 			<div id="codewindow" >
 					<div id="line1" class="insideCodeWindow selectedLine">Hello</div>
 					<div id="line2" class="insideCodeWindow">Hello Again</div>
 			</div>
-			<button id="step">step</button>
+			<button class="steps" id="nextStep">Next</button>
+			<button class="steps" id="prevStep">Prev</button>
 			<br/>
-			<textarea></textarea>
+			<textarea id="console" readonly="true" style="resize: none;"></textarea>
 		</div>
 		<div class="contright subcontent">
 			<div id="graphbox">
-				<div class="bar" id="elem1" style="height:75%"></div>
-				<div class="bar" id="elem2" style="height:50%"></div>
-				<div class="bar" id="elem3" style="height:75%"></div>
+				
 			</div>
-			<div id="stack" class="contleft"></div>
-			<div id="order" class="contright"></div>
+			<div id="stack" class="contleft">
+				<table>
+					<tr>
+						<td>qsort(0,25)</td>
+					</tr>
+				</table>
+			</div>
+			<div id="order" class="contright">
+				<table>
+					<tr>
+						<td>[5,3,27,13,54,67,24,]</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
 	<div id="footer"></div>

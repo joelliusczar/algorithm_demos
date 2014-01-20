@@ -1,9 +1,9 @@
-*
-{
-	border: dashed;
-    border-width: 1px;
-    border-color: #0000FF;
-}
+/***/
+/*{*/
+/*	border: dashed;*/
+/*    border-width: 1px;*/
+/*    border-color: #0000FF;*/
+/*}*/
 
 #header {
 	height: 50px;
@@ -32,6 +32,15 @@ background-color: #E0E4CC;
 width: 1175px;
 height: 700px;
 float: right;
+}
+
+table
+{
+	font-family: sans-serif;
+	font-size: x-small;
+	border: solid 1px;
+	background-color: #ffffff;
+	width:100%;
 }
 
 textarea
@@ -78,26 +87,49 @@ color: #ffffff;
 {
 height: 150px;
 background-color:#eeeeec;
+position: relative;
+padding: 0 5px 0 5px;
 }
 
 .bar
 {
-	width: 25px;
+	width: 2px;
+	
+	position: absolute;
+	bottom: 0;
+}
+
+.unselectedelem
+{
 	background-color:#204a87;
-	display:inline-block;
+}
+
+.selectedelem
+{
+	background-color:#edd400
+}
+
+.switchedelem
+{
+	background-color: #ef2929;
+}
+
+.steps
+{
+	display: inline-block;
 }
 
 #stack
 {
 	height: 200px;
 	width: 100px;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 
 #order
 {
 	height: 200px;
-	width: 470px;
+	width: 480px;
 	overflow: scroll;
 }
 
