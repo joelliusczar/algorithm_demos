@@ -3,12 +3,41 @@ barposition = 0;
 maxallowedsize = 100;
 maxallowedelements = 185;
 spinnerinitialvalue = 0;
-lineList =[];
-codepointer = 0;
+
+
+
+function Frame(myscope)
+{
+	this.scope = this.scope || myscope || {};
+	this.prevline = this.prevline || -1;
+	this.nextLine = this.nextLine || 0;
+	this.callStack = this.callStack || [];
+	this.negCallStack = this.negCallStack || [];
+	this.codepointer = this.codepointer || 0;
+	this.nextFunction = this.nextFunction || {};
+	
+	this.prepareNextLineSelection = function(nl){
+		this.prevline = this.nextLine;
+		this.nextLine = nl||this.nextLine+1;
+	};
+	
+	this.popStack = function(){
+		this.negCallStack.push(this.scope);
+		this.scope = this.callStack.pop();
+		
+	};
+}
 
 $(document).ready(function(){
 	
 	var toBeSorted =[];
+	var myframe = {};
+	$("#nextStep").attr("disabled","disabled");
+	$("#prevStep").attr("disabled","disabled");
+	$("#start").attr("disabled","disabled");
+	
+	setUpCodeSpace();
+	
 	var spinner = $("#numberbox").spinner({min: -1,max:maxallowedelements +1, step:1,spin: function(e,ui){
 	if(ui.value > maxallowedelements){
 		$(this).spinner("value",spinnerinitialvalue);
@@ -22,10 +51,15 @@ $(document).ready(function(){
 	
 	$("#getvalue").click(function(e){
 		var n;
+		$("#start").removeAttr("disabled");
+		$("#nextStep").attr("disabled","disabled");
+		$("#prevStep").attr("disabled","disabled");
+		myframe = {};
+		lineList = [];
 		if(validateInputAsInterger(n = $("#numberbox").val())){
 			console.log("valid: n =" + n);
-			toBeSorted = generateRandomizedList(n,maxallowedsize);
-			initialDrawGraph(toBeSorted);	
+			//toBeSorted = generateRandomizedList(n,maxallowedsize);
+			initialDrawGraph(toBeSorted = [30,75,20,50,90]);	
 		}
 		else{
 			console.log("invalid");
@@ -34,16 +68,18 @@ $(document).ready(function(){
 	});
 	
 	$("#start").click(function(e){
-		LoadCode([30,50,75,90]);
+		$("#nextStep").removeAttr("disabled");
+		$("#prevStep").removeAttr("disabled");
+		$("#start").val("Restart");
+		myframe = LoadCode(toBeSorted);
+		
 	});
 	
 	$("#nextStep").click(function(e){
-		execNextLine();
+		execNextLine(myframe);
 	});
 	
 	$("#prevStep").click(function(e){
-		var x = [30,50,75,90];
-		swapBars(x,0,3);		
 	});
 
 
@@ -89,7 +125,10 @@ function nextLine(lineCurrent,lineNext){
 	{
 		$("#line"+lineCurrent).removeClass("selectedLine");
 	}
-	$("#line"+lineNext).addClass("selectedLine");
+	if(lineNext != -1)
+	{
+		$("#line"+lineNext).addClass("selectedLine");
+	}
 }
 
 function markReadyForSwap(index1,index2)
@@ -102,6 +141,12 @@ function swapClasses(element,currentclass,newclass)
 {
 	$(element).removeClass(currentclass);
 	$(element).addClass(newclass);
+}
+
+function callSwaps(toBeSorted,index1,index2)
+{
+	swapBars(toBeSorted,index1,index2);
+	 return swap(toBeSorted,index1,index2);
 }
 
 function swap(toBeSorted,index1,index2)
@@ -132,5 +177,36 @@ function makeBarsNormal(index1,index2)
 {
 	swapClasses("#elem"+index1,"switchedelem","unselectedelem");
 	swapClasses("#elem"+index2,"switchedelem","unselectedelem");
+}
+
+function outputToDivConsole(outputStr)
+{
+	$("#console").append("<p>"+outputStr+"</p>");
+}
+
+function outputCurrentSortOrder(toBeSorted)
+{
+	$("#order").find("tbody:last").append("<tr><td>["+ toBeSorted.toString()+"]</td></tr>");
+}
+
+function outputToStackTable(funcName,rn){
+	if($("#row"+rn).length)
+	{
+		$("#row"+rn).remove();
+	}
+	$("#stack").find("tbody:last").append("<tr id=\"row"+rn+" \"><td>"+funcName+"</td></tr>");
+}
+
+function markStackFrameForDeletion(index)
+{
+	$("#row"+index).addClass("disabledStackFrame");
+}
+
+function setUpCodeSpace()
+{
+	for(i = 0; i < source.length;i++){
+		var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\" style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</div>";
+		$("#codewindow").append(line);
+	}
 }
 

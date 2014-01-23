@@ -1,21 +1,14 @@
 <head>
 	<meta charset="utf-8">
-	<link href="jquery-ui.css" rel="stylesheet">
-	<link href="jquery-ui.base.css" rel="stylesheet">
-	<link href="jquery-ui.core.css" rel="stylesheet">
-	<link href="jquery-ui.button.css" rel="stylesheet">
-	<link href="jquery-ui.spinner.css" rel="stylesheet">
+	<link href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" rel="stylesheet">
 	<link href="sorting.css" rel="stylesheet">
 	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 	<script type="text/javascript">
 	if(typeof Jquery == 'undefined')
 	document.write(unescape("%3Cscript src='JQuery.js'"+
 	"type='text/javascript'%3E%3C/script%3E"));
 	</script>
-	<script src="jquery.ui.core.min.js"></script>
-	<script src="jquery.ui.widget.js"></script>
-	<script src="jquery.ui.button.js"></script>
-	<script src="jquery.ui.spinner.js"></script>
 	<script src="algorithms_setup.js"></script>
 	<script src="qsort.js"></script>
 	
@@ -29,15 +22,12 @@
 		<div class="contleft subcontent">
 			<input id="numberbox" name="value">
 			<button id="getvalue">Submit</button>
-			<button id="start">Start</button>
-			<div id="codewindow" >
-					<div id="line1" class="insideCodeWindow selectedLine">Hello</div>
-					<div id="line2" class="insideCodeWindow">Hello Again</div>
-			</div>
-			<button class="steps" id="nextStep">Next</button>
-			<button class="steps" id="prevStep">Prev</button>
+			<button id="start" disabled="true">Start</button>
+			<div id="codewindow" class="outputfont" ></div>
+			<button class="steps" disabled="true" id="prevStep">Prev</button>
+			<button class="steps" disabled="true" id="nextStep">Next</button>
 			<br/>
-			<textarea id="console" readonly="true" style="resize: none;"></textarea>
+			<div id="console" class="outputfont"></div>
 		</div>
 		<div class="contright subcontent">
 			<div id="graphbox">
@@ -46,15 +36,13 @@
 			<div id="stack" class="contleft">
 				<table>
 					<tr>
-						<td>qsort(0,25)</td>
+						<td>Initial</td>
 					</tr>
 				</table>
 			</div>
 			<div id="order" class="contright">
 				<table>
-					<tr>
-						<td>[5,3,27,13,54,67,24,]</td>
-					</tr>
+					
 				</table>
 			</div>
 		</div>

@@ -43,10 +43,22 @@ table
 	width:100%;
 }
 
-textarea
+tr td
+{
+	border-bottom: solid 1px;
+}
+
+p
+{
+	margin:0;
+}
+
+#console
 {
 width:580px;
 height: 300px;
+background-color: #ffffff;
+border: solid 1px;
 }
 
 .subcontent
@@ -67,11 +79,16 @@ height: 300px;
 	float:right;
 }
 
+.outputfont
+{
+	font-family: monospace;
+	font-size: small;
+}
+
 #codewindow
 {
 border: 5px solid;
-font-family: monospace;
-font-size: small;
+
 background-color: #ffffff;
 height: 300px;
 overflow: scroll;
@@ -117,6 +134,11 @@ padding: 0 5px 0 5px;
 .steps
 {
 	display: inline-block;
+}
+
+.disabledStackFrame
+{
+	color: #ff0000;
 }
 
 #stack
