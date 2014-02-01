@@ -5,18 +5,32 @@
 /*    border-color: #0000FF;*/
 /*}*/
 
-#header {
-	height: 50px;
-	background-color: #F38630;
-	}
-	
-#leftcolumn
+#content
 {
-	height: 300px;
-	width: 150px;
-	background-color: #A7DBD8;
-	float: left;
-	margin-bottom: 10px;
+background-color: #E0E4CC;
+width: 1370px;
+height: 700px;
+/*float: right;*/
+}
+
+#codewindow
+{
+border: 5px solid;
+
+background-color: #ffffff;
+height: 300px;
+overflow: scroll;
+}
+
+
+
+#console
+{
+/*width:580px;*/
+height: 300px;
+background-color: #ffffff;
+border: solid 1px;
+overflow-y: scroll;
 }
 
 #footer {
@@ -26,12 +40,59 @@
     clear: both;
 }
 
-#content
+#graphbox
 {
-background-color: #E0E4CC;
-width: 1370px;
-height: 700px;
-/*float: right;*/
+height: 150px;
+background-color:#eeeeec;
+position: relative;
+padding: 0 5px 0 5px;
+}
+
+#header {
+	height: 50px;
+	background-color: #F38630;
+	}
+
+#leftcolumn
+{
+	height: 300px;
+	width: 100px;
+	background-color: #A7DBD8;
+	float: left;
+	margin-bottom: 10px;
+}
+
+#opcounter
+{
+	float: left;
+	margin-right: 25px;
+}
+
+#order
+{
+	height: 200px;
+	width: 480px;
+	overflow: scroll;
+}
+
+#pointerbox
+{
+	background-color: #a6e22d;
+	height: 25px;
+	padding: 0 5px 0 5px;
+	position: relative;
+}
+
+#stack
+{
+	height: 200px;
+	width: 125px;
+	overflow-y: scroll;
+}
+
+p
+{
+	margin:0;
 }
 
 table
@@ -48,36 +109,6 @@ tr td
 	border-bottom: solid 1px;
 }
 
-p
-{
-	margin:0;
-}
-
-#console
-{
-/*width:580px;*/
-height: 300px;
-background-color: #ffffff;
-border: solid 1px;
-overflow-y: scroll;
-}
-
-.counter
-{
-	background-color: #555753;
-	height:25px;
-}
-
-#opcounter
-{
-	float: left;
-	margin-right: 25px;
-}
-.subcontent
-{
-	height:690px;
-	width: 610px;
-}
 
 .contleft
 {
@@ -91,20 +122,31 @@ overflow-y: scroll;
 	float:right;
 }
 
+
+.counter
+{
+	background-color: #555753;
+	height:25px;
+}
+
+
+
+
+.subcontent
+{
+	height:690px;
+	width: 610px;
+}
+
+
+
 .outputfont
 {
 	font-family: monospace;
 	font-size: small;
 }
 
-#codewindow
-{
-border: 5px solid;
 
-background-color: #ffffff;
-height: 300px;
-overflow: scroll;
-}
 
 .selectedLine
 {
@@ -112,17 +154,11 @@ background-color: #729fcf;
 color: #ffffff;
 }
 
-#graphbox
-{
-height: 150px;
-background-color:#eeeeec;
-position: relative;
-padding: 0 5px 0 5px;
-}
+
 
 .bar
 {
-	width: 2px;
+/*	width: 2px;*/
 	
 	position: absolute;
 	bottom: 0;
@@ -148,23 +184,11 @@ padding: 0 5px 0 5px;
 	display: inline-block;
 }
 
-.disabledStackFrame
+.disabledStackFrame, .swapedArrayElem
 {
 	color: #ff0000;
 }
 
-#stack
-{
-	height: 200px;
-	width: 125px;
-	overflow-y: scroll;
-}
 
-#order
-{
-	height: 200px;
-	width: 480px;
-	overflow: scroll;
-}
 
 

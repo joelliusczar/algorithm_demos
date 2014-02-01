@@ -1,3 +1,8 @@
+var leftcolor = "#f41ccd";
+var rightcolor = "#fce94f";
+var itercolor = "#729fcf";
+var lastcolor = "#ad7fa8";
+
 var formatStr = JSON.stringify;
 
 	source = [["qsort(v[],int left, int right)","0"],
@@ -42,13 +47,14 @@ function callQsort(qSortFrame)
 		outputToStackTable("qSort(array,"+Lscope.left+","+Lscope.right+")",qSortFrame.callStack.length-1);
 		qSortFrame.nextFunction = checkIfLeftgtRight;
 		updateCounter(1);
+		drawPointers({position:Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor});
 }
 
 function checkIfLeftgtRight(qSortFrame)
 {
 		qSortFrame.nextLine(4);
 		var Lscope = qSortFrame.scope;
-		var outputStr = formatCondtionStr({type: "if",test: ">=",v:Lscope.v,index1:Lscope.left,index2: Lscope.right,
+		var outputStr = formatCondtionStr({type: "if",test: ">=",index1:Lscope.left,index2: Lscope.right,
 			compare: function(a,b){ return a >= b}});
 		outputToDivConsole(outputStr);
 		if(Lscope.left >= Lscope.right){
@@ -76,7 +82,7 @@ function swapLeftandMid(qSortFrame)
 	qSortFrame.nextFunction = assignLast;
 	callSwaps(Lscope.v,Lscope.left,mid);
 	outputToDivConsole(formatStr(Lscope));
-	outputCurrentSortOrder(Lscope.v);
+	drawPointers({position:Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor},{position: mid,color:"#4e9a06"});
 }
 
 function assignLast(qSortFrame)
@@ -86,6 +92,7 @@ function assignLast(qSortFrame)
 	outputToDivConsole(formatStr(qSortFrame.scope));
 	qSortFrame.nextFunction = initialForStatement;
 	updateCounter(1);
+	drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},{position:qSortFrame.scope.last,color:lastcolor});
 }
 
 function initialForStatement(qSortFrame)
@@ -93,6 +100,8 @@ function initialForStatement(qSortFrame)
 
 	qSortFrame.scope.i = qSortFrame.scope.left + 1;
 	genericForCondition(qSortFrame);
+	drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},{position:qSortFrame.scope.last,color:lastcolor},
+		{position: qSortFrame.scope.i, color: itercolor});
 	
 }
 
@@ -130,10 +139,12 @@ function conditionalSwap(qSortFrame)
 {
 	var Lscope = qSortFrame.scope;
 	qSortFrame.nextLine(10);
+	++Lscope.last;
 	outputToDivConsole(formatStr(Lscope));
-	callSwaps(Lscope.v,++Lscope.last,Lscope.i);
+	drawPointers({position: Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor},{position:Lscope.last,color:lastcolor},
+		{position: Lscope.i, color: itercolor});
+	callSwaps(Lscope.v,Lscope.last,Lscope.i);
 	qSortFrame.nextFunction = endSwapIfBlock;
-	outputCurrentSortOrder(Lscope.v);
 }
 
 function endSwapIfBlock(qSortFrame)
@@ -146,6 +157,8 @@ function repeatForStatement(qSortFrame)
 {
 	qSortFrame.nextLine(12);
 	qSortFrame.scope.i++;
+	drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},{position:qSortFrame.scope.last,color:lastcolor},
+		{position: qSortFrame.scope.i, color: itercolor});
 	genericForCondition(qSortFrame);
 	updateCounter(1);
 }
@@ -160,10 +173,11 @@ function swapLeftAndLast(qSortFrame)
 {
 	var Lscope = qSortFrame.scope;
 	qSortFrame.nextLine(13);
+	drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},{position:qSortFrame.scope.last,color:lastcolor},
+		{position: qSortFrame.scope.i, color: itercolor});
 	outputToDivConsole(formatStr(Lscope));
 	callSwaps(Lscope.v,Lscope.left,Lscope.last);
 	qSortFrame.nextFunction = recursiveCallQSort;
-	outputCurrentSortOrder(Lscope.v);
 }
 
 function recursiveCallQSort(qSortFrame)
@@ -207,7 +221,7 @@ function returnAddressAgain(qSortFrame)
 
 function genericReturn(qSortFrame)
 {
-	outputToDivConsole("Returning to calling function - stack pointer:" + qSortFrame.callStack.length -1);
+	outputToDivConsole("Returning to calling function - stack pointer:" + (qSortFrame.callStack.length -1));
 	qSortFrame.nextFunction = qSortFrame.scope.returnAddressFunction;
 	qSortFrame.popStack();
 	markStackFrameForDeletion(qSortFrame.callStack.length);

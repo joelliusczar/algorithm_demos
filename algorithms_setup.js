@@ -1,5 +1,4 @@
 barmarginsize = 3;
-barposition = 0;
 maxallowedsize = 100;
 maxallowedelements = 185;
 spinnerinitialvalue = 0;
@@ -10,6 +9,7 @@ intervalKey = undefined;
 consoleDiv = undefined;
 stackDiv = undefined;
 orderDiv = undefined;
+barwidth = 0;
 
 
 function Frame(pScope)
@@ -70,9 +70,11 @@ $(document).ready(function(){
 		$("#prevStep").attr("disabled","disabled");
 		myframe = {};
 		if(validateInputAsInterger(n = $("#numberbox").val())){
+			barwidth = $("#graphbox").width()/n;
 			toBeSorted = generateRandomizedList(n,maxallowedsize);
 			//toBeSorted = [30,75,20,50,90]
 			initialDrawGraph(toBeSorted);	
+			barwidth = $("#graphbox").width()/n;
 		}
 		else{
 			console.log("invalid");
@@ -93,7 +95,7 @@ $(document).ready(function(){
 	});
 	
 	$("#autostepone").click(function(e){
-		autoSort(500,toBeSorted);
+		autoSort(250,toBeSorted);
 	});
 
 
@@ -142,15 +144,15 @@ function initialDrawGraph(toBeSorted)
 	emptyGraph();
 	for(i=0;i<toBeSorted.length;i++){
 		barhtml = "<div class=\"bar unselectedelem\" id=\"elem" + i + "\" style=\"margin-left:" + 
-			(barposition = ((barmarginsize)+barposition)) + "px; height:"+ toBeSorted[i] +"%;\"></div>";
+			((barmarginsize+barwidth)*i) + "px; height:"+ toBeSorted[i] +"%; width:"+barwidth+"px; \"></div>";
 		$(barhtml).appendTo("#graphbox");
 	}
 }
 
+
 function emptyGraph()
 {
 	$("#graphbox").empty();
-	barposition = 0;
 }
 
 function getRandomInt(min,max){
@@ -192,6 +194,26 @@ function nextLine(lineCurrent,lineNext){
 	}
 }
 
+function drawPointers()
+{
+	killAllPointers();
+	var overlapchecker = {};
+	var barhtml = "";
+	for(var i = 0;i < arguments.length;i++){
+		overlapchecker[arguments[i].position.toString()]++ || (overlapchecker[arguments[i].position.toString()] = 1)
+		barhtml = "<div class=\"bar pointerbar\" id=\"elem" + i + "\" style=\"margin-left:" + 
+			((barmarginsize+barwidth)*arguments[i].position) + "px; height: "+(100/overlapchecker[arguments[i].position.toString()])+"%; background-color:"+arguments[i].color+
+				"; width:"+barwidth+"px; \"></div>";
+			$(barhtml).appendTo("#pointerbox");
+	}
+}
+
+
+function killAllPointers()
+{
+	$(".pointerbar").remove();
+}
+
 function markReadyForSwap(index1,index2)
 {	
 	swapClasses("#elem" + index1,"unselectedelem","selectedelem");
@@ -208,6 +230,7 @@ function callSwaps(toBeSorted,index1,index2)
 {	
 	swapBars(toBeSorted,index1,index2);
 	outputToDivConsole(formatSwapStr(toBeSorted,index1,index2));
+	outputCurrentSortOrder(toBeSorted,index1,index2);
 	updateCounter(5,1);
 	return swap(toBeSorted,index1,index2);
 }
@@ -277,20 +300,28 @@ function outputToDivConsole(outputStr)
 	autoScroll(consoleDiv);
 }
 
-function outputCurrentSortOrder(toBeSorted)
+function outputCurrentSortOrder(needsSorting,index1,index2)
 {
+	var toBeSorted = needsSorting.slice();
+	if(index1 && index2){
+		toBeSorted[index1] = "<span class=\"swapedArrayElem\" >"+ toBeSorted[index1] + "</span>";
+		toBeSorted[index2] = "<span class=\"swapedArrayElem\" >"+ toBeSorted[index2] + "</span>";
+	}
 	$("#order").find("tbody:last").append("<tr><td>["+ toBeSorted.toString()+"]</td></tr>");
-	autoScroll(orderDiv);
+	autoScroll(orderDiv,16);
 }
 
 function outputToStackTable(funcName){
-	var lastRow = $("#stack").find("tbody:last").find("tr:last");
-	if(lastRow.hasClass("disabledStackFrame"))
-	{
-		lastRow.remove();
+	var disabledRows = $("#stack").find("tbody:last").find("tr").filter(".disabledStackFrame");
+	if(disabledRows.length){
+		var firstDisabled = disabledRows.first();
+		firstDisabled.removeClass("disabledStackFrame");
+		firstDisabled.html("<td>"+funcName+"</td>");
 	}
-	$("#stack").find("tbody:last").append("<tr><td>"+funcName+"</td></tr>");
-	autoScroll(stackDiv);
+	else{
+		$("#stack").find("tbody:last").append("<tr><td>"+funcName+"</td></tr>");
+		autoScroll(stackDiv);
+	}
 }
 
 function markStackFrameForDeletion(i)
@@ -298,10 +329,10 @@ function markStackFrameForDeletion(i)
 	$("#stack").find("tbody:last").find("tr").not(".disabledStackFrame").last().addClass("disabledStackFrame");
 }
 
-function autoScroll(scrolldiv)
+function autoScroll(scrolldiv,interval)
 {
 	if(scrolldiv.scrollTop < scrolldiv.scrollHeight - scrolldiv.clientHeight){
-		scrolldiv.scrollTop += 10;
+		scrolldiv.scrollTop += (interval || 13);
 	}
 }
 
@@ -318,6 +349,7 @@ function pageCleanUp()
 	if(intervalKey){
 		clearInterval(intervalKey);
 	}
+	killAllPointers();
 	alert("array is done sorting");
 }
 
