@@ -3,29 +3,40 @@ barposition = 0;
 maxallowedsize = 100;
 maxallowedelements = 185;
 spinnerinitialvalue = 0;
+hasStarted = false;
+opcounter = 0;
+swapCounter = 0;
+intervalKey = undefined;
+consoleDiv = undefined;
+stackDiv = undefined;
+orderDiv = undefined;
 
 
-
-function Frame(myscope)
+function Frame(pScope)
 {
-	this.scope = this.scope || myscope || {};
-	this.prevline = this.prevline || -1;
-	this.nextLine = this.nextLine || 0;
-	this.callStack = this.callStack || [];
-	this.negCallStack = this.negCallStack || [];
-	this.codepointer = this.codepointer || 0;
-	this.nextFunction = this.nextFunction || {};
-	
-	this.prepareNextLineSelection = function(nl){
-		this.prevline = this.nextLine;
-		this.nextLine = nl||this.nextLine+1;
-	};
+	this.scope = pScope|| {};
+	this.prevline = -1;
+	this.callStack = [];
+	this.negCallStack = [];
+	this.nextFunction = {};
 	
 	this.popStack = function(){
-		this.negCallStack.push(this.scope);
-		this.scope = this.callStack.pop();
+		
+		//this.negCallStack.push($.extend({},this.scope));
+		if(this.callStack.length == 0){
+			this.scope = {};
+		}
+		else{
+			this.scope = this.callStack.pop();
+		}
 		
 	};
+	
+	this.nextLine = function(nl){
+		nextLine(this.prevline,nl);
+		this.prevline = nl;
+	};
+	
 }
 
 $(document).ready(function(){
@@ -35,6 +46,9 @@ $(document).ready(function(){
 	$("#nextStep").attr("disabled","disabled");
 	$("#prevStep").attr("disabled","disabled");
 	$("#start").attr("disabled","disabled");
+	consoleDiv = document.getElementById("console");
+	stackDiv = document.getElementById("stack");
+	orderDiv = document.getElementById("order");
 	
 	setUpCodeSpace();
 	
@@ -55,11 +69,10 @@ $(document).ready(function(){
 		$("#nextStep").attr("disabled","disabled");
 		$("#prevStep").attr("disabled","disabled");
 		myframe = {};
-		lineList = [];
 		if(validateInputAsInterger(n = $("#numberbox").val())){
-			console.log("valid: n =" + n);
-			//toBeSorted = generateRandomizedList(n,maxallowedsize);
-			initialDrawGraph(toBeSorted = [30,75,20,50,90]);	
+			toBeSorted = generateRandomizedList(n,maxallowedsize);
+			//toBeSorted = [30,75,20,50,90]
+			initialDrawGraph(toBeSorted);	
 		}
 		else{
 			console.log("invalid");
@@ -68,22 +81,59 @@ $(document).ready(function(){
 	});
 	
 	$("#start").click(function(e){
-		$("#nextStep").removeAttr("disabled");
-		$("#prevStep").removeAttr("disabled");
-		$("#start").val("Restart");
-		myframe = LoadCode(toBeSorted);
-		
+		myframe = execInitial(toBeSorted);
 	});
 	
 	$("#nextStep").click(function(e){
 		execNextLine(myframe);
 	});
 	
-	$("#prevStep").click(function(e){
+	$("#autostepfive").click(function(e){
+		autoSort(5000,toBeSorted);
+	});
+	
+	$("#autostepone").click(function(e){
+		autoSort(500,toBeSorted);
 	});
 
 
 });
+
+function execInitial(toBeSorted)
+{
+	var currentframe = {};
+	$("#nextStep").removeAttr("disabled");
+		$("#prevStep").removeAttr("disabled");
+		$("#start").html("Restart");
+		if(hasStarted)
+		{
+			$(".selectedLine").removeClass("selectedLine");
+			$("#order").find("tbody").empty();
+			$("#stack").find("tbody").empty();
+			$("#console").empty();
+			initialDrawGraph(toBeSorted);
+			updateCounter(opcounter = 0,swapCounter = 0);
+		}
+		currentframe = LoadCode(toBeSorted.slice());
+		hasStarted = true;
+		
+		return currentframe;
+}
+
+function execNextLine(currentFrame)
+{
+	$(".switchedelem").removeClass("switchedelem").addClass("unselectedelem");
+	currentFrame.nextFunction(currentFrame);
+}
+
+function autoSort(time,toBeSorted)
+{
+	var currentFrame = {};
+	currentFrame = execInitial(toBeSorted);
+	intervalKey = setInterval(function(){
+		execNextLine(currentFrame);
+	},time);
+}
 
 function initialDrawGraph(toBeSorted)
 {
@@ -120,6 +170,17 @@ function validateInputAsInterger(input){
 	return numRegex.test(input);
 }
 
+function updateCounter(increments,swapIncrements)
+{
+	opcounter += increments;
+	$("#opcounter").html("n: "+ opcounter);
+	if(swapIncrements)
+	{
+		swapCounter += swapIncrements;
+		$("#swapcounter").html("swaps: "+ swapCounter);
+	}
+}
+
 function nextLine(lineCurrent,lineNext){
 	if(lineCurrent != -1)
 	{
@@ -144,9 +205,11 @@ function swapClasses(element,currentclass,newclass)
 }
 
 function callSwaps(toBeSorted,index1,index2)
-{
+{	
 	swapBars(toBeSorted,index1,index2);
-	 return swap(toBeSorted,index1,index2);
+	outputToDivConsole(formatSwapStr(toBeSorted,index1,index2));
+	updateCounter(5,1);
+	return swap(toBeSorted,index1,index2);
 }
 
 function swap(toBeSorted,index1,index2)
@@ -173,33 +236,73 @@ function swapBars(toBeSorted,index1,index2)
 	swapClasses("#elem" + index2,"unselectedelem","switchedelem");
 }
 
+
+
+function formatSwapStr(v,index1,index2)
+{
+	return "swaping v[" +index1+"]: "+v[index1]+" and v["+index2+"]: "+ v[index2];
+}
+
 function makeBarsNormal(index1,index2)
 {
 	swapClasses("#elem"+index1,"switchedelem","unselectedelem");
 	swapClasses("#elem"+index2,"switchedelem","unselectedelem");
 }
 
+function formatCondtionStr(cond)
+{
+	var op1;
+	var op2;
+	var idxCmp = "";
+	if(cond.v){
+		idxCmp = "v["+cond.index1+"] "+cond.test+" v["+cond.index2+"] ";
+		op1 = cond.v[cond.index1];
+		op2 = cond.v[cond.index2];
+	}
+	else{
+		op1 = cond.index1;
+		op2 = cond.index2;
+	}
+	
+	var outputStr = cond.type + " - "+idxCmp + op1 +" "+ cond.test+" " +op2 +" ? " + cond.compare(op1,op2);
+	
+	
+	return outputStr;
+	
+}
+
 function outputToDivConsole(outputStr)
 {
 	$("#console").append("<p>"+outputStr+"</p>");
+	autoScroll(consoleDiv);
 }
 
 function outputCurrentSortOrder(toBeSorted)
 {
 	$("#order").find("tbody:last").append("<tr><td>["+ toBeSorted.toString()+"]</td></tr>");
+	autoScroll(orderDiv);
 }
 
-function outputToStackTable(funcName,rn){
-	if($("#row"+rn).length)
+function outputToStackTable(funcName){
+	var lastRow = $("#stack").find("tbody:last").find("tr:last");
+	if(lastRow.hasClass("disabledStackFrame"))
 	{
-		$("#row"+rn).remove();
+		lastRow.remove();
 	}
-	$("#stack").find("tbody:last").append("<tr id=\"row"+rn+" \"><td>"+funcName+"</td></tr>");
+	$("#stack").find("tbody:last").append("<tr><td>"+funcName+"</td></tr>");
+	autoScroll(stackDiv);
 }
 
-function markStackFrameForDeletion(index)
+function markStackFrameForDeletion(i)
 {
-	$("#row"+index).addClass("disabledStackFrame");
+	$("#stack").find("tbody:last").find("tr").not(".disabledStackFrame").last().addClass("disabledStackFrame");
+}
+
+function autoScroll(scrolldiv)
+{
+	if(scrolldiv.scrollTop < scrolldiv.scrollHeight - scrolldiv.clientHeight){
+		scrolldiv.scrollTop += 10;
+	}
 }
 
 function setUpCodeSpace()
@@ -208,5 +311,13 @@ function setUpCodeSpace()
 		var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\" style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</div>";
 		$("#codewindow").append(line);
 	}
+}
+
+function pageCleanUp()
+{
+	if(intervalKey){
+		clearInterval(intervalKey);
+	}
+	alert("array is done sorting");
 }
 
