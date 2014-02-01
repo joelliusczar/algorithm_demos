@@ -29,9 +29,9 @@
 #content
 {
 background-color: #E0E4CC;
-width: 1175px;
+width: 1370px;
 height: 700px;
-float: right;
+/*float: right;*/
 }
 
 table
@@ -55,7 +55,7 @@ p
 
 #console
 {
-width:580px;
+/*width:580px;*/
 height: 300px;
 background-color: #ffffff;
 border: solid 1px;
@@ -76,7 +76,7 @@ overflow-y: scroll;
 .subcontent
 {
 	height:690px;
-	width: 580px;
+	width: 610px;
 }
 
 .contleft
