@@ -1,4 +1,4 @@
-barmarginsize = 3;
+barmarginsize = 1;
 maxallowedsize = 100;
 maxallowedelements = 185;
 spinnerinitialvalue = 0;
@@ -10,6 +10,8 @@ consoleDiv = undefined;
 stackDiv = undefined;
 orderDiv = undefined;
 barwidth = 0;
+graphboxSideMargins = 10;
+algorithm = {};
 
 
 function Frame(pScope)
@@ -44,13 +46,18 @@ $(document).ready(function(){
 	var toBeSorted =[];
 	var myframe = {};
 	$("#nextStep").attr("disabled","disabled");
-	$("#prevStep").attr("disabled","disabled");
 	$("#start").attr("disabled","disabled");
+	
+	$("#autostepfast").attr("disabled","disabled");
+	$("#autostepslow").attr("disabled","disabled");
+	$("#autostepnormal").attr("disabled","disabled");
+	
 	consoleDiv = document.getElementById("console");
 	stackDiv = document.getElementById("stack");
 	orderDiv = document.getElementById("order");
 	
-	setUpCodeSpace();
+	algorithm = QSort;
+	setUpCodeSpace(algorithm.sourceCode);
 	
 	var spinner = $("#numberbox").spinner({min: -1,max:maxallowedelements +1, step:1,spin: function(e,ui){
 	if(ui.value > maxallowedelements){
@@ -65,16 +72,20 @@ $(document).ready(function(){
 	
 	$("#getvalue").click(function(e){
 		var n;
-		$("#start").removeAttr("disabled");
-		$("#nextStep").attr("disabled","disabled");
-		$("#prevStep").attr("disabled","disabled");
+		
 		myframe = {};
 		if(validateInputAsInterger(n = $("#numberbox").val())){
-			barwidth = $("#graphbox").width()/n;
+			barwidth = Math.round((($("#graphbox").width()) -graphboxSideMargins -(barmarginsize*n))/n);
 			toBeSorted = generateRandomizedList(n,maxallowedsize);
 			//toBeSorted = [30,75,20,50,90]
 			initialDrawGraph(toBeSorted);	
-			barwidth = $("#graphbox").width()/n;
+			$("#start").removeAttr("disabled");
+			$("#autostepfast").removeAttr("disabled");
+			$("#autostepslow").removeAttr("disabled");
+			$("#autostepnormal").removeAttr("disabled");
+			$("#nextStep").attr("disabled","disabled");
+			$("#prevStep").attr("disabled","disabled");
+			
 		}
 		else{
 			console.log("invalid");
@@ -90,16 +101,21 @@ $(document).ready(function(){
 		execNextLine(myframe);
 	});
 	
-	$("#autostepfive").click(function(e){
+	$("#autostepslow").click(function(e){
 		autoSort(5000,toBeSorted);
 	});
 	
-	$("#autostepone").click(function(e){
-		autoSort(250,toBeSorted);
+	$("#autostepnormal").click(function(e){
+		autoSort(500,toBeSorted);
+	});
+	
+	$("#autostepfast").click(function(e){
+		autoSort(50,toBeSorted);
 	});
 
 
 });
+
 
 function execInitial(toBeSorted)
 {
@@ -116,7 +132,8 @@ function execInitial(toBeSorted)
 			initialDrawGraph(toBeSorted);
 			updateCounter(opcounter = 0,swapCounter = 0);
 		}
-		currentframe = LoadCode(toBeSorted.slice());
+		currentframe = algorithm.LoadCode(toBeSorted.slice());
+		execNextLine(currentframe);
 		hasStarted = true;
 		
 		return currentframe;
@@ -130,6 +147,7 @@ function execNextLine(currentFrame)
 
 function autoSort(time,toBeSorted)
 {
+	$("#start").attr("disabled","disabled");
 	var currentFrame = {};
 	currentFrame = execInitial(toBeSorted);
 	intervalKey = setInterval(function(){
@@ -149,7 +167,6 @@ function initialDrawGraph(toBeSorted)
 	}
 }
 
-
 function emptyGraph()
 {
 	$("#graphbox").empty();
@@ -162,7 +179,7 @@ function getRandomInt(min,max){
 function generateRandomizedList(numofelements,maxpotential){
 	var toBeSorted = [];
 	for(i = 0;i< numofelements;i++){
-		toBeSorted[i] = getRandomInt(0,maxpotential);
+		toBeSorted[i] = getRandomInt(1,maxpotential);
 	}
 	return toBeSorted;
 }
@@ -320,7 +337,7 @@ function outputToStackTable(funcName){
 	}
 	else{
 		$("#stack").find("tbody:last").append("<tr><td>"+funcName+"</td></tr>");
-		autoScroll(stackDiv);
+		autoScroll(stackDiv,16);
 	}
 }
 
@@ -336,7 +353,7 @@ function autoScroll(scrolldiv,interval)
 	}
 }
 
-function setUpCodeSpace()
+function setUpCodeSpace(source)
 {
 	for(i = 0; i < source.length;i++){
 		var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\" style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</div>";

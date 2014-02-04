@@ -5,7 +5,8 @@ var lastcolor = "#ad7fa8";
 
 var formatStr = JSON.stringify;
 
-	source = [["qsort(v[],int left, int right)","0"],
+QSort = {
+sourceCode: [["qsort(v[],int left, int right)","0"],
 				["{","0;"],
 				["int i;","5em;"],
 				["int last;","5em;"],
@@ -21,22 +22,17 @@ var formatStr = JSON.stringify;
 				["swap(v,left,last);","5em;"],
 				["qsort(v,left, last -1);","5em;"],
 				["qsort(v,last+1,right);","5em;"],
-				["}","0;"]];
-				
-
-
-function LoadCode(toBeSorted)
+				["}","0;"]],
+LoadCode: function(toBeSorted)
 {
-	qSortScope = {v:toBeSorted,returnAddressFunction: terminalCall,left: 0, right: toBeSorted.length -1}
-	myFrame = new Frame(qSortScope);
+	qSortScope = {v:toBeSorted,returnAddressFunction: QSort.terminalCall,left: 0, right: toBeSorted.length -1}
+	var myFrame = new Frame(qSortScope);
 	
-	myFrame.nextFunction = callQsort;
-	execNextLine(myFrame);
+	myFrame.nextFunction = QSort.callQsort;
+	
 	return myFrame;
-}
-
-
-function callQsort(qSortFrame)
+},
+callQsort: function(qSortFrame)
 {
 	
 		qSortFrame.nextLine(0);
@@ -45,12 +41,11 @@ function callQsort(qSortFrame)
 		outputToDivConsole(formatStr(Lscope));
 		outputCurrentSortOrder(Lscope.v);
 		outputToStackTable("qSort(array,"+Lscope.left+","+Lscope.right+")",qSortFrame.callStack.length-1);
-		qSortFrame.nextFunction = checkIfLeftgtRight;
+		qSortFrame.nextFunction = QSort.checkIfLeftgtRight;
 		updateCounter(1);
 		drawPointers({position:Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor});
-}
-
-function checkIfLeftgtRight(qSortFrame)
+},
+checkIfLeftgtRight: function(qSortFrame)
 {
 		qSortFrame.nextLine(4);
 		var Lscope = qSortFrame.scope;
@@ -58,68 +53,62 @@ function checkIfLeftgtRight(qSortFrame)
 			compare: function(a,b){ return a >= b}});
 		outputToDivConsole(outputStr);
 		if(Lscope.left >= Lscope.right){
-			qSortFrame.nextFunction = insideIfReturn;
+			qSortFrame.nextFunction = QSort.insideIfReturn;
 		}
 		else{
-			qSortFrame.nextFunction = swapLeftandMid;
+			qSortFrame.nextFunction = QSort.swapLeftandMid;
 		}
 		updateCounter(1);
-}
-
-function insideIfReturn(qSortFrame)
+},
+insideIfReturn: function(qSortFrame)
 {
 		qSortFrame.nextLine(5);
-		genericReturn(qSortFrame);
+		QSort.genericReturn(qSortFrame);
 		
-}
-
-function swapLeftandMid(qSortFrame)
+},
+swapLeftandMid: function(qSortFrame)
 {
 	var Lscope = qSortFrame.scope;
 	var mid = Math.floor((Lscope.left + Lscope.right)/2);
 	
 	qSortFrame.nextLine(6);
-	qSortFrame.nextFunction = assignLast;
+	qSortFrame.nextFunction = QSort.assignLast;
 	callSwaps(Lscope.v,Lscope.left,mid);
 	outputToDivConsole(formatStr(Lscope));
 	drawPointers({position:Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor},{position: mid,color:"#4e9a06"});
-}
-
-function assignLast(qSortFrame)
+},
+assignLast: function(qSortFrame)
 {
 	qSortFrame.nextLine(7);
 	qSortFrame.scope.last = qSortFrame.scope.left;
 	outputToDivConsole(formatStr(qSortFrame.scope));
-	qSortFrame.nextFunction = initialForStatement;
+	qSortFrame.nextFunction =QSort.initialForStatement;
 	updateCounter(1);
 	drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},{position:qSortFrame.scope.last,color:lastcolor});
-}
-
-function initialForStatement(qSortFrame)
+},
+initialForStatement: function(qSortFrame)
 {
-
+	//var qS = new QSort();
 	qSortFrame.scope.i = qSortFrame.scope.left + 1;
-	genericForCondition(qSortFrame);
+	QSort.genericForCondition(qSortFrame);
 	drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},{position:qSortFrame.scope.last,color:lastcolor},
 		{position: qSortFrame.scope.i, color: itercolor});
 	
-}
-
-function genericForCondition(qSortFrame)
+},
+genericForCondition: function(qSortFrame)
 {
 	qSortFrame.nextLine(8);
 	outputToDivConsole(formatCondtionStr({type:"for loop",test: "<=",index1: qSortFrame.scope.i,
 		index2: qSortFrame.scope.right,compare: function(a,b){return a <= b}}));
 	if(qSortFrame.scope.i <= qSortFrame.scope.right){
-		qSortFrame.nextFunction = iflessThanLeftCondition;
+		qSortFrame.nextFunction = QSort.iflessThanLeftCondition;
 	}
 	else{
-		qSortFrame.nextFunction = swapLeftAndLast;
+		qSortFrame.nextFunction = QSort.swapLeftAndLast;
 	}
 	updateCounter(1);
-}
-
-function iflessThanLeftCondition(qSortFrame)
+},
+iflessThanLeftCondition: function(qSortFrame)
 {
 	qSortFrame.nextLine(9);
 	var Lscope = qSortFrame.scope;
@@ -127,15 +116,14 @@ function iflessThanLeftCondition(qSortFrame)
 		compare: function(a,b){return a < b}}));
 	
 	if(Lscope.v[Lscope.i] < Lscope.v[Lscope.left]){
-		qSortFrame.nextFunction = conditionalSwap;
+		qSortFrame.nextFunction = QSort.conditionalSwap;
 	}
 	else{
-		qSortFrame.nextFunction = endSwapIfBlock;
+		qSortFrame.nextFunction = QSort.endSwapIfBlock;
 	}
 	updateCounter(1);
-}
-
-function conditionalSwap(qSortFrame)
+},
+conditionalSwap:function(qSortFrame)
 {
 	var Lscope = qSortFrame.scope;
 	qSortFrame.nextLine(10);
@@ -144,32 +132,28 @@ function conditionalSwap(qSortFrame)
 	drawPointers({position: Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor},{position:Lscope.last,color:lastcolor},
 		{position: Lscope.i, color: itercolor});
 	callSwaps(Lscope.v,Lscope.last,Lscope.i);
-	qSortFrame.nextFunction = endSwapIfBlock;
-}
-
-function endSwapIfBlock(qSortFrame)
+	qSortFrame.nextFunction = QSort.endSwapIfBlock;
+},
+endSwapIfBlock: function(qSortFrame)
 {
 	qSortFrame.nextLine(11);
-	qSortFrame.nextFunction = repeatForStatement;
-}
-
-function repeatForStatement(qSortFrame)
+	qSortFrame.nextFunction = QSort.repeatForStatement;
+},
+repeatForStatement: function(qSortFrame)
 {
 	qSortFrame.nextLine(12);
 	qSortFrame.scope.i++;
 	drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},{position:qSortFrame.scope.last,color:lastcolor},
 		{position: qSortFrame.scope.i, color: itercolor});
-	genericForCondition(qSortFrame);
+	QSort.genericForCondition(qSortFrame);
 	updateCounter(1);
-}
-
-function endForBlock(qSortFrame)
+},
+endForBlock:function(qSortFrame)
 {
 	qSortFrame.nextLine(12);
-	qSortFrame.nextFunction = swapLeftAndLast;
-}
-
-function swapLeftAndLast(qSortFrame)
+	qSortFrame.nextFunction = QSort.swapLeftAndLast;
+},
+swapLeftAndLast: function(qSortFrame)
 {
 	var Lscope = qSortFrame.scope;
 	qSortFrame.nextLine(13);
@@ -177,10 +161,9 @@ function swapLeftAndLast(qSortFrame)
 		{position: qSortFrame.scope.i, color: itercolor});
 	outputToDivConsole(formatStr(Lscope));
 	callSwaps(Lscope.v,Lscope.left,Lscope.last);
-	qSortFrame.nextFunction = recursiveCallQSort;
-}
-
-function recursiveCallQSort(qSortFrame)
+	qSortFrame.nextFunction = QSort.recursiveCallQSort;
+},
+recursiveCallQSort: function(qSortFrame)
 {	
 	
 	var oldV = qSortFrame.scope.v;
@@ -188,50 +171,46 @@ function recursiveCallQSort(qSortFrame)
 	var oldLeft = qSortFrame.scope.left;
 	qSortFrame.nextLine(14);
 	qSortFrame.callStack.push(qSortFrame.scope);
-	qSortFrame.scope = {v:oldV,returnAddressFunction: returnAddressRecursiveCallQSort,left: oldLeft,right:oldLast-1};
+	qSortFrame.scope = {v:oldV,returnAddressFunction: QSort.returnAddressRecursiveCallQSort,left: oldLeft,right:oldLast-1};
 	outputToDivConsole("Calling qSort recursively");
-	qSortFrame.nextFunction = callQsort;
+	qSortFrame.nextFunction = QSort.callQsort;
 	
-}
-
-function returnAddressRecursiveCallQSort(qSortFrame)
+},
+returnAddressRecursiveCallQSort: function(qSortFrame)
 {
 	qSortFrame.nextLine(14);
-	qSortFrame.nextFunction = recursiveCallQSortAgain;
-}
-
-function recursiveCallQSortAgain(qSortFrame)
+	qSortFrame.nextFunction = QSort.recursiveCallQSortAgain;
+},
+recursiveCallQSortAgain: function(qSortFrame)
 {
 	var oldV = qSortFrame.scope.v;
 	var oldLast = qSortFrame.scope.last;
 	var oldRight = qSortFrame.scope.right;
 	qSortFrame.nextLine(15);
 	qSortFrame.callStack.push(qSortFrame.scope);
-	qSortFrame.scope = {v:oldV,returnAddressFunction: returnAddressAgain,left: oldLast+1,right:oldRight};
+	qSortFrame.scope = {v:oldV,returnAddressFunction: QSort.returnAddressAgain,left: oldLast+1,right:oldRight};
 	outputToDivConsole("Calling qSort recursively");
-	qSortFrame.nextFunction = callQsort;
+	qSortFrame.nextFunction = QSort.callQsort;
 	
-}
-
-function returnAddressAgain(qSortFrame)
+},
+returnAddressAgain: function(qSortFrame)
 {
 	qSortFrame.nextLine(16);
-	genericReturn(qSortFrame)
-}
-
-function genericReturn(qSortFrame)
+	QSort.genericReturn(qSortFrame)
+},
+genericReturn: function(qSortFrame)
 {
 	outputToDivConsole("Returning to calling function - stack pointer:" + (qSortFrame.callStack.length -1));
 	qSortFrame.nextFunction = qSortFrame.scope.returnAddressFunction;
 	qSortFrame.popStack();
 	markStackFrameForDeletion(qSortFrame.callStack.length);
 	updateCounter(1);
-}
-
-function terminalCall(qSortFrame)
+},
+terminalCall: function(qSortFrame)
 {
 	qSortFrame.scope = undefined;
 	pageCleanUp();
+}
 }
 
 
