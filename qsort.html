@@ -17,17 +17,21 @@
 
 <body>
 	<div id="header"></div>
-	<div id="leftcolumn"></div>
+	<div id="leftcolumn">
+<!--		<ul>-->
+<!--			<li><a href="#" class="sort">KR_QSort</a></li>-->
+<!--		</ul>-->
+	</div>
 	<div id="content">
 		<div class="contleft subcontent">
 			<input id="numberbox" name="value">
 			<button id="getvalue">Submit</button>
-			<button id="start" disabled="true">Start</button>
+			<button id="start" disabled="true">Start/Next</button>
 			<div id="codewindow" class="outputfont" ></div>
-			<button class="steps" disabled="true" id="nextStep">Next</button>
 			<button class="steps" id="autostepslow">Auto Step: Slow</button>
 			<button class="steps" id="autostepnormal">Auto Step: Normal</button>
-			<button class="step" id="autostepfast">Auto Step: Fast</button>
+			<button class="steps" id="autostepfast">Auto Step: Fast</button>
+			<button class="steps" id="pause">Pause</button>
 			<br/>
 			<div id="console" class="outputfont"></div>
 		</div>

@@ -6,13 +6,11 @@ hasStarted = false;
 opcounter = 0;
 swapCounter = 0;
 intervalKey = undefined;
-consoleDiv = undefined;
-stackDiv = undefined;
-orderDiv = undefined;
 barwidth = 0;
 graphboxSideMargins = 10;
 algorithm = {};
-
+stateEnum = {NOTSTARTED:1,LOADED:2, STARTED:4,AUTO:8,PAUSED: 16,FINISHED: 32}
+state = stateEnum.NOTSTARTED;
 
 function Frame(pScope)
 {
@@ -45,16 +43,12 @@ $(document).ready(function(){
 	
 	var toBeSorted =[];
 	var myframe = {};
-	$("#nextStep").attr("disabled","disabled");
 	$("#start").attr("disabled","disabled");
 	
 	$("#autostepfast").attr("disabled","disabled");
 	$("#autostepslow").attr("disabled","disabled");
 	$("#autostepnormal").attr("disabled","disabled");
-	
-	consoleDiv = document.getElementById("console");
-	stackDiv = document.getElementById("stack");
-	orderDiv = document.getElementById("order");
+	$("#pause").attr("disabled","disabled");
 	
 	algorithm = QSort;
 	setUpCodeSpace(algorithm.sourceCode);
@@ -72,8 +66,12 @@ $(document).ready(function(){
 	
 	$("#getvalue").click(function(e){
 		var n;
-		
 		myframe = {};
+		if(intervalKey){
+			clearInterval(intervalKey);
+		}
+		state = stateEnum.LOADED;
+		
 		if(validateInputAsInterger(n = $("#numberbox").val())){
 			barwidth = Math.round((($("#graphbox").width()) -graphboxSideMargins -(barmarginsize*n))/n);
 			toBeSorted = generateRandomizedList(n,maxallowedsize);
@@ -86,6 +84,7 @@ $(document).ready(function(){
 			$("#nextStep").attr("disabled","disabled");
 			$("#prevStep").attr("disabled","disabled");
 			
+			
 		}
 		else{
 			console.log("invalid");
@@ -94,23 +93,50 @@ $(document).ready(function(){
 	});
 	
 	$("#start").click(function(e){
-		myframe = execInitial(toBeSorted);
-	});
-	
-	$("#nextStep").click(function(e){
-		execNextLine(myframe);
+		if(state & (stateEnum.LOADED|stateEnum.NOTSTARTED)){
+			myframe = execInitial(toBeSorted);
+			state = stateEnum.STARTED;
+		}
+		else{
+			execNextLine(myframe);
+		}
+		state = stateEnum.STARTED;
 	});
 	
 	$("#autostepslow").click(function(e){
-		autoSort(5000,toBeSorted);
+		$("#autostepfast").attr("disabled","disabled");
+		$("#autostepslow").attr("disabled","disabled");
+		$("#autostepnormal").attr("disabled","disabled");
+		$("#start").attr("disabled","disabled");
+		myframe = autoSort(5000,myframe,toBeSorted);
 	});
 	
 	$("#autostepnormal").click(function(e){
-		autoSort(500,toBeSorted);
+		$("#autostepfast").attr("disabled","disabled");
+		$("#autostepslow").attr("disabled","disabled");
+		$("#autostepnormal").attr("disabled","disabled");
+		$("#start").attr("disabled","disabled");
+		myframe = autoSort(500,myframe,toBeSorted);
 	});
 	
 	$("#autostepfast").click(function(e){
-		autoSort(50,toBeSorted);
+		$("#autostepfast").attr("disabled","disabled");
+		$("#autostepslow").attr("disabled","disabled");
+		$("#autostepnormal").attr("disabled","disabled");
+		$("#start").attr("disabled","disabled");
+		myframe = autoSort(50,myframe,toBeSorted);
+	});
+	
+	$("#pause").click(function(e){
+		if(intervalKey){
+			clearInterval(intervalKey);
+		}
+		state = stateEnum.PAUSED;
+		$("#pause").attr("disabled","disabled");
+		$("#start").removeAttr("disabled");
+		$("#autostepfast").removeAttr("disabled");
+		$("#autostepslow").removeAttr("disabled");
+		$("#autostepnormal").removeAttr("disabled");
 	});
 
 
@@ -120,10 +146,7 @@ $(document).ready(function(){
 function execInitial(toBeSorted)
 {
 	var currentframe = {};
-	$("#nextStep").removeAttr("disabled");
-		$("#prevStep").removeAttr("disabled");
-		$("#start").html("Restart");
-		if(hasStarted)
+		if((state &(stateEnum.NOTSTARTED|stateEnum.LOADED)))
 		{
 			$(".selectedLine").removeClass("selectedLine");
 			$("#order").find("tbody").empty();
@@ -145,14 +168,21 @@ function execNextLine(currentFrame)
 	currentFrame.nextFunction(currentFrame);
 }
 
-function autoSort(time,toBeSorted)
+function autoSort(time,currentFrame,toBeSorted)
 {
 	$("#start").attr("disabled","disabled");
-	var currentFrame = {};
-	currentFrame = execInitial(toBeSorted);
+	$("#pause").removeAttr("disabled");
+	if(state &(stateEnum.LOADED|stateEnum.NOTSTARTED))
+	{
+		currentFrame = execInitial(toBeSorted);
+	}
+	state = stateEnum.AUTO;
 	intervalKey = setInterval(function(){
 		execNextLine(currentFrame);
 	},time);
+	
+	return currentFrame;
+	
 }
 
 function initialDrawGraph(toBeSorted)
@@ -314,7 +344,7 @@ function formatCondtionStr(cond)
 function outputToDivConsole(outputStr)
 {
 	$("#console").append("<p>"+outputStr+"</p>");
-	autoScroll(consoleDiv);
+	autoScroll(console);
 }
 
 function outputCurrentSortOrder(needsSorting,index1,index2)
@@ -325,7 +355,7 @@ function outputCurrentSortOrder(needsSorting,index1,index2)
 		toBeSorted[index2] = "<span class=\"swapedArrayElem\" >"+ toBeSorted[index2] + "</span>";
 	}
 	$("#order").find("tbody:last").append("<tr><td>["+ toBeSorted.toString()+"]</td></tr>");
-	autoScroll(orderDiv,16);
+	autoScroll(order,17);
 }
 
 function outputToStackTable(funcName){
@@ -337,7 +367,7 @@ function outputToStackTable(funcName){
 	}
 	else{
 		$("#stack").find("tbody:last").append("<tr><td>"+funcName+"</td></tr>");
-		autoScroll(stackDiv,16);
+		autoScroll(stack,17);
 	}
 }
 
@@ -355,6 +385,7 @@ function autoScroll(scrolldiv,interval)
 
 function setUpCodeSpace(source)
 {
+	$("#codewindow").empty();
 	for(i = 0; i < source.length;i++){
 		var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\" style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</div>";
 		$("#codewindow").append(line);
@@ -367,6 +398,11 @@ function pageCleanUp()
 		clearInterval(intervalKey);
 	}
 	killAllPointers();
+	state = stateEnum.FINISHED;
+	$("#start").attr("disabled","disabled");
+	$("#autostepslow").attr("disabled","disabled");
+	$("#autostepnormal").attr("disabled","disabled");
+	$("#pause").attr("disabled","disabled");
 	alert("array is done sorting");
 }
 
