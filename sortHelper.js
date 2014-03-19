@@ -175,6 +175,26 @@ function sortController(maxSize)
 		var numRegex = /^\d+$/;
 		return numRegex.test(input);
 	}
+	
+	function StrRepeat(str,num)
+	{
+		return new Array(num + 1).join(str);
+	}
+	
+	function StrPadLeft(minlen, str,padStr)
+	{
+	
+		if(typeof str != "string"){
+			str = str.toString();
+		}
+		
+		if(typeof padStr != "string"){
+			padStr = padStr.toString();
+		}
+		
+        var size = minlen > str.length? minlen: str.length;
+		return String(StrRepeat(padStr,minlen) + str).slice(-size);
+	}
 	//#utilities>
 
 	//#<swap_operations
@@ -274,7 +294,7 @@ function sortController(maxSize)
 			toBeSorted[index2] = "<span class=\"swapedArrayElem\" >"+ toBeSorted[index2] + "</span>";
 		}
 		$("#order").find("tbody:last").append("<tr><td>["+ toBeSorted.toString()+"]</td></tr>");
-		autoScroll(order,17);
+		autoScroll(order);
 	};
 
 	context.outputToStackTable = function(funcName){
@@ -286,7 +306,7 @@ function sortController(maxSize)
 		}
 		else{
 			$("#stack").find("tbody:last").append("<tr><td>"+funcName+"</td></tr>");
-			autoScroll(stack,17);
+			autoScroll(stack);
 		}
 	};
 	//outputs_to_displays#>
@@ -325,7 +345,7 @@ function sortController(maxSize)
 	function autoScroll(scrolldiv,interval)
 	{
 		if(scrolldiv.scrollTop < scrolldiv.scrollHeight - scrolldiv.clientHeight){
-			scrolldiv.scrollTop += (interval || 13);
+			scrolldiv.scrollTop += (interval || 17);
 		}
 	}
 
@@ -333,7 +353,7 @@ function sortController(maxSize)
 	{
 		$("#codewindow").empty();
 		for(i = 0; i < source.length;i++){
-			var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\">"+"<span>"+(i+1)+": </span>"+
+			var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\"><span>"+StrPadLeft(source.length.toString().length,(i+1).toString(),"_")+": </span>"+
 			" <span style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</span></div>";
 			$("#codewindow").append(line);
 		}
