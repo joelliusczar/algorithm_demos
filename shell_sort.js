@@ -18,8 +18,8 @@ function ShellSort(context)
 	
 	sorter.LoadCode = function(toBeSorted)
 	{
-		qSortScope = {v:toBeSorted,returnAddressFunction: sorter.terminalCall,left: 0, right: toBeSorted.length -1}
-		var myFrame = new Frame(qSortScope);
+		var SortScope = {v:toBeSorted,returnAddressFunction: sorter.terminalCall}
+		var myFrame = new Frame(SortScope);
 	
 		//myFrame.nextFunction = 
 	

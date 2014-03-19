@@ -71,6 +71,10 @@ function Frame(pScope)
 		$("#pause").click(function(e){
 			controller.pauseAction();
 		});
+		
+		$("#shellsort").click(function(e){
+			controller.funcLoader("shell_sort");	
+		});
 
 
 	});

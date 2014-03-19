@@ -59,7 +59,12 @@ function sortController(maxSize)
 		};
 		context.funcLoader = function(funcName)
 		{
-			$.getScript(funcName+".js");
+			$.getScript(funcName+".js",function(data, textStatus, jqxhr) {
+				console.log(data); //data returned
+				console.log(textStatus); //success
+				console.log(jqxhr.status); //200
+				console.log('Load was performed.');
+				});
 			//return 
 		};
 		context.getValueAction = function()
@@ -255,9 +260,9 @@ function sortController(maxSize)
 	//#format_string_operations>
 
 	//#<outputs_to_displays
-	context.outputToDivConsole = function(outputStr)
+	context.outputToDivConsole = function(outputStr,lineNum)
 	{
-		$("#console").append("<p>"+outputStr+"</p>");
+		$("#console").append("<p>"+(lineNum>0?(lineNum +": "):"")+outputStr+"</p>");
 		autoScroll(console);
 	};
 
@@ -299,7 +304,7 @@ function sortController(maxSize)
 
 	context.nextLine = function(lineNext){
 	
-		this.lineCurrent = this.lineCurrent || -1;
+		this.lineCurrent = this.lineCurrent === 0? 0: this.lineCurrent || -1;
 		if(this.lineCurrent != -1)
 		{
 			$("#line"+this.lineCurrent).removeClass("selectedLine");
@@ -328,7 +333,8 @@ function sortController(maxSize)
 	{
 		$("#codewindow").empty();
 		for(i = 0; i < source.length;i++){
-			var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\" style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</div>";
+			var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\">"+"<span>"+(i+1)+": </span>"+
+			" <span style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</span></div>";
 			$("#codewindow").append(line);
 		}
 	}
