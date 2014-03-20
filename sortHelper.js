@@ -192,7 +192,7 @@ function sortController(maxSize)
 			padStr = padStr.toString();
 		}
 		
-        var size = minlen > str.length? minlen: str.length;
+        var size = (padStr.length * (minlen - str.length)) + str.length; 
 		return String(StrRepeat(padStr,minlen) + str).slice(-size);
 	}
 	//#utilities>
@@ -353,7 +353,7 @@ function sortController(maxSize)
 	{
 		$("#codewindow").empty();
 		for(i = 0; i < source.length;i++){
-			var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\"><span>"+StrPadLeft(source.length.toString().length,(i+1).toString(),"_")+": </span>"+
+			var line = "<div id=\"line"+i+"\" class=\"insideCodeWindow\"><span>"+StrPadLeft(source.length.toString().length,(i+1).toString(),"&nbsp;")+": </span>"+
 			" <span style=\"margin-left:"+ source[i][1]+"\"  >"+source[i][0]+"</span></div>";
 			$("#codewindow").append(line);
 		}
