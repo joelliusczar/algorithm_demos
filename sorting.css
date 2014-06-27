@@ -8,7 +8,7 @@
 #content
 {
 background-color: #E0E4CC;
-width: 1325px;
+width: 1475px;
 height: 700px;
 /*float: right;*/
 }
@@ -42,10 +42,11 @@ overflow-y: scroll;
 
 #graphbox
 {
-height: 150px;
-background-color:#eeeeec;
-position: relative;
-padding: 0 5px 0 5px;
+	height: 150px;
+	background-color:#eeeeec;
+	position: relative;
+	padding: 0 5px 0 5px;
+
 }
 
 #header {
@@ -83,11 +84,35 @@ padding: 0 5px 0 5px;
 	position: relative;
 }
 
+#pointer_x_box
+{
+	background-color: #3d175c;
+	height: 25px;
+	padding: 0 5px 0 5px;
+	position: relative;
+}
+
 #stack
 {
 	height: 200px;
 	width: 125px;
 	overflow-y: scroll;
+}
+
+#pointerLblBox
+{
+	background-color: #40abbf;
+	float: right;
+	width: 100%;
+	height: inherit;
+	position: relative;
+}
+
+#drawingBox
+{
+	background-color:#eeeeec;
+	height: 200px;
+	margin-bottom: 5px;
 }
 
 li
@@ -142,7 +167,7 @@ tr td
 .subcontent
 {
 	height:690px;
-	width: 610px;
+	width: 680px;
 }
 
 
@@ -153,12 +178,15 @@ tr td
 	font-size: small;
 }
 
-
+.notLblBox
+{
+	width:610px;
+}
 
 .selectedLine
 {
-background-color: #729fcf;
-color: #ffffff;
+	background-color: #729fcf;
+	color: #ffffff;
 }
 
 
@@ -169,6 +197,12 @@ color: #ffffff;
 	
 	position: absolute;
 	bottom: 0;
+}
+
+.reachers
+{
+	position: absolute;
+	top: 0;
 }
 
 .unselectedelem

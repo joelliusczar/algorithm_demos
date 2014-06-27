@@ -5,6 +5,7 @@ function sortController(maxSize)
 	var context = {}
 	var barmarginsize = 1;
 	var barwidth = 0;
+	var xBarHeight = 5;
 	var graphboxSideMargins = 10;
 	var hasStarted = false;
 	var opcounter = 0;
@@ -123,19 +124,68 @@ function sortController(maxSize)
 	{
 		$(".pointerbar").remove();
 	}		
+	
+	function drawVerticals(gPointerObjs)
+	{
+		//stores the number of elements that are displayed to a single location
+		var overlapchecker = {}; 
+		for(var i = 0;i < gPointerObjs.length;i++){
+			//checks if two blocks are displayed to the same location. If so, then it one of them is halved.
+			//if something exists at that location, increment it otherwise initialize it to 1
+			overlapchecker[gPointerObjs[i].position.toString()]++ || (overlapchecker[gPointerObjs[i].position.toString()] = 1);
+			$("#pointerbox").append("<div class=\"bar pointerbar\" id=\"elem" + i + "\"></div>");
+			$("#pointerbox").find("#elem"+i).css("margin-left", getBarMarginSize(gPointerObjs[i].position)+"px")
+				.css("height",(100/overlapchecker[gPointerObjs[i].position.toString()]) +"%")
+				.css("width",barwidth+"px")
+				.css("background-color",gPointerObjs[i].color);
+
+		}
+	}
+	
+	//draw the bars that reach from the horizontal lines to the vertical.
+	function drawReachers(gPointerObjs){
+		for(var i = 0;i<gPointerObjs.length;i++){
+			
+			$("#pointer_x_box").append("<div class=\"pointerbar reachers\" id=\"reachElem" +i +"\"></div>");
+			$("#pointer_x_box").find("#reachElem" +i)
+				.css("margin-left", getBarMarginSize(gPointerObjs[i].position) +"px")
+				.css("height",(xBarHeight*i) +"px")
+				.css("width",barwidth+"px")
+				.css("background-color",gPointerObjs[i].color);
+		}
+	}
+	
+	function drawHorizontals(gPointerObjs)
+	{
+
+		for(var i = 0; i < gPointerObjs.length;i++){
+
+			
+			$("#pointer_x_box").append("<div class=\"pointerbar \" id=\"xElem" +i +"\"></div>");
+			$("#pointer_x_box").find("#xElem" +i)
+				.css("margin-left", getBarMarginSize(gPointerObjs[i].position) +"px")
+				.css("height",xBarHeight +"px")
+				.css("background-color",gPointerObjs[i].color);
+				
+		}
+	}
+	
+	function getBarMarginSize(position)
+	{
+		return ((barmarginsize+barwidth)*position); 
+	}
 
 	context.drawPointers = function()
 	{
 		killAllPointers();
-		var overlapchecker = {};
+		
 		var barhtml = "";
-		for(var i = 0;i < arguments.length;i++){
-			overlapchecker[arguments[i].position.toString()]++ || (overlapchecker[arguments[i].position.toString()] = 1)
-			barhtml = "<div class=\"bar pointerbar\" id=\"elem" + i + "\" style=\"margin-left:" + 
-				((barmarginsize+barwidth)*arguments[i].position) + "px; height: "+(100/overlapchecker[arguments[i].position.toString()])+"%; background-color:"+arguments[i].color+
-					"; width:"+barwidth+"px; \"></div>";
-				$(barhtml).appendTo("#pointerbox");
-		}
+		var sorted = Array.slice(arguments);
+		sorted.sort(function(a,b){return (b.position - a.position)});
+		drawVerticals(sorted);
+		drawHorizontals(sorted);
+		drawReachers(sorted);
+		
 	};
 	//#pointers>
 
@@ -195,6 +245,7 @@ function sortController(maxSize)
         var size = (padStr.length * (minlen - str.length)) + str.length; 
 		return String(StrRepeat(padStr,minlen) + str).slice(-size);
 	}
+	
 	//#utilities>
 
 	//#<swap_operations

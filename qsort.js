@@ -31,6 +31,10 @@ function QSort(context){
 		context.updateCounter(1);
 	}
 	
+	function getDrawObject(position,color,name){
+		return {position:position,color:color,name: name};
+	}
+	
 	
 	var sorter = {};
 	sorter.sourceCode = [["qsort(v[],int left, int right)","0"],
@@ -72,7 +76,9 @@ function QSort(context){
 			context.outputToStackTable("qSort(array,"+Lscope.left+","+Lscope.right+")",qSortFrame.callStack.length-1);
 			qSortFrame.nextFunction = sorter.checkIfLeftgtRight;
 			context.updateCounter(1);
-			context.drawPointers({position:Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor});
+			context.drawPointers(
+				 sorter.getLeftDrawObject(Lscope.left)
+				,sorter.getRightDrawObject(Lscope.right));
 	};
 	
 	sorter.checkIfLeftgtRight = function(qSortFrame)
@@ -105,7 +111,10 @@ function QSort(context){
 		qSortFrame.nextFunction = sorter.assignLast;
 		context.callSwaps(Lscope.v,Lscope.left,mid);
 		context.outputToDivConsole(formatStr(Lscope),7);
-		context.drawPointers({position:Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor},{position: mid,color:"#4e9a06"});
+		context.drawPointers(
+			 sorter.getLeftDrawObject(Lscope.left)
+			,sorter.getRightDrawObject(Lscope.right)
+			,{position: mid,color:"#4e9a06",name:"mid"});
 	};
 	sorter.assignLast = function(qSortFrame)
 	{
@@ -114,16 +123,21 @@ function QSort(context){
 		context.outputToDivConsole(formatStr(qSortFrame.scope),8);
 		qSortFrame.nextFunction =sorter.initialForStatement;
 		context.updateCounter(1);
-		context.drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},
-			{position:qSortFrame.scope.last,color:lastcolor});
+		context.drawPointers(
+			 sorter.getLeftDrawObject(qSortFrame.scope.left)
+			,sorter.getRightDrawObject(qSortFrame.scope.right)
+			,sorter.getLastDrawObject(qSortFrame.scope.last));
 	};
 	sorter.initialForStatement = function(qSortFrame)
 	{
 		//var qS = new QSort();
 		qSortFrame.scope.i = qSortFrame.scope.left + 1;
 		genericForCondition(qSortFrame);
-		context.drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},
-			{position:qSortFrame.scope.last,color:lastcolor},{position: qSortFrame.scope.i, color: itercolor});
+		context.drawPointers(
+			 sorter.getLeftDrawObject(qSortFrame.scope.left)
+			,sorter.getRightDrawObject(qSortFrame.scope.right)
+			,sorter.getLastDrawObject(qSortFrame.scope.last)
+			,sorter.getIteratorDrawObject(qSortFrame.scope.i));
 	
 	};
 	sorter.iflessThanLeftCondition = function(qSortFrame)
@@ -147,8 +161,11 @@ function QSort(context){
 		context.nextLine(9);
 		++Lscope.last;
 		context.outputToDivConsole(formatStr(Lscope));
-		context.drawPointers({position: Lscope.left,color:leftcolor},{position: Lscope.right,color:rightcolor},{position:Lscope.last,color:lastcolor},
-			{position: Lscope.i, color: itercolor});
+		context.drawPointers(
+			 sorter.getLeftDrawObject(Lscope.left)
+			,sorter.getRightDrawObject(Lscope.right)
+			,sorter.getLastDrawObject(Lscope.last)
+			,sorter.getIteratorDrawObject(Lscope.i));
 		context.callSwaps(Lscope.v,Lscope.last,Lscope.i);
 		qSortFrame.nextFunction = sorter.endSwapIfBlock;
 	};
@@ -161,8 +178,11 @@ function QSort(context){
 	{
 		context.nextLine(11);
 		qSortFrame.scope.i++;
-		context.drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},
-			{position:qSortFrame.scope.last,color:lastcolor},{position: qSortFrame.scope.i, color: itercolor});
+		context.drawPointers(
+			 sorter.getLeftDrawObject(qSortFrame.scope.left)
+			,sorter.getRightDrawObject(qSortFrame.scope.right)
+			,sorter.getLastDrawObject(qSortFrame.scope.last)
+			,sorter.getIteratorDrawObject(qSortFrame.scope.i));
 		genericForCondition(qSortFrame);
 		context.updateCounter(1);
 	};
@@ -175,8 +195,11 @@ function QSort(context){
 	{
 		var Lscope = qSortFrame.scope;
 		context.nextLine(12);
-		context.drawPointers({position:qSortFrame.scope.left,color:leftcolor},{position: qSortFrame.scope.right,color:rightcolor},		
-			{position:qSortFrame.scope.last,color:lastcolor},{position: qSortFrame.scope.i, color: itercolor});
+		context.drawPointers(
+			 sorter.getLeftDrawObject(qSortFrame.scope.left)
+			,sorter.getRightDrawObject(qSortFrame.scope.right)	
+			,sorter.getLastDrawObject(qSortFrame.scope.last)
+			,sorter.getIteratorDrawObject(qSortFrame.scope.i));
 		context.outputToDivConsole(formatStr(Lscope));
 		context.callSwaps(Lscope.v,Lscope.left,Lscope.last);
 		qSortFrame.nextFunction = sorter.recursiveCallQSort;
@@ -221,6 +244,25 @@ function QSort(context){
 		qSortFrame.scope = undefined;
 		context.pageCleanUp();
 	};
+	
+	sorter.getLeftDrawObject = function(position){
+		return getDrawObject(position,leftcolor,"left");
+	}
+	
+	sorter.getRightDrawObject = function(position){
+		return getDrawObject(position,rightcolor,"right");
+	}
+	
+	sorter.getLastDrawObject = function(position){
+		return getDrawObject(position,lastcolor,"Last");
+	}
+	
+	sorter.getIteratorDrawObject = function(position){
+		return getDrawObject(position,itercolor,"Iterator");
+	}
+	
+	
+	
 		
 	return sorter;
 }
